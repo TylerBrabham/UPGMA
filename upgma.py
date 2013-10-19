@@ -39,10 +39,9 @@ def upgma(dis_map):
 
 		#Make a new matrix which combines clusters min_i and min_j
 		new_map = np.arange((n-1)*(n-1)).reshape(n-1,n-1)
-		(m,n) = (m-1,n-1)
 
 		#create a new count variable for the updated cluster sizes (after combining min clusters)
-		new_C = [1 for i in range(n)]
+		new_C = [1 for i in range(n-1)]
 		new_C[0] = C[min_i]+C[min_j]
 		j = 1
 		for l in range(1,n):
@@ -54,43 +53,44 @@ def upgma(dis_map):
 
 		#add the new cluster to the output leave list, with appropriate height
 		upgma_tree.append((cluster_count,cluster[min_i],cluster[min_j],float(min_dist)/2.0))
+
+		#shift the rest of the clusters over by 1 to make room for new cluster at front
 		new_cluster = {}
 		new_cluster[0] = cluster_count
 		cluster_count += 1
-		#shift the rest of the clusters over by 1
 		k = 1
 		for i in range(1,len(cluster)):
 			if i!=min_j and i!=min_i:
 				new_cluster[k] = cluster[i]
 				k+=1
 
-		#update the dis map by removing min_i,min_j and adding new letter to the matrix
+		#update the dis map by removing min_i,min_j and adding new cluster to the matrix at index 0
 		i = 1
 		for k in range(n):
 			j = 1
-			if k==min_i:
+			if k==min_i or k==min_j:
 				pass
 			else:
 				for l in range(n):
-					if l==min_j:
+					if l==min_j or l==min_i:
 						pass
 					else:
 						new_map[i,j] = current_map[k,l]
 						j += 1
 				i += 1
-		l = 0
-		for k in range(n+1):
-			if k!= min_i or k!=min_j:
+
+		l = 1
+		for k in range(n):
+			if k!= min_i and k!=min_j:
 				new_map[0,l] = float(current_map[min_i,k]*C[min_i] + current_map[min_j,k]*C[min_j])/float(C[min_i]+C[min_j])
 				new_map[l,0] = new_map[0,l]#symmetric
 				l += 1
 
-
-
+		#reset all the tables 
 		C = new_C
 		current_map = new_map
 		cluster = new_cluster
-
+		(m,n) = (m-1,n-1)
 
 	#Now there are two remaining indices. We combine them and add them to the out list.
 	print current_map
@@ -99,7 +99,7 @@ def upgma(dis_map):
 	return upgma_tree
 
 
-dis_map = np.matrix('0 1 1; 1 0 1; 1 1 0')
+dis_map = np.matrix('0 5 2; 5 0 1; 2 1 0')
 
 upgma_tree = upgma(dis_map)
 print upgma_tree
