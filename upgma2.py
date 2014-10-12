@@ -15,7 +15,6 @@ def closest_cluster(dis_map, m, n):
 	return best_cluster, best_distance
 
 def upgma(dis_map, m, n):
-	#represents the leaves. (node,child1,child2,height,size). -1 indicates no child
 	upgma_tree = {}
 	clusters = range(n)
 	for i in clusters:
